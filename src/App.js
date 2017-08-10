@@ -8,46 +8,45 @@ import './App.css';
 
 class BooksApp extends React.Component {
   state = {
-    books: [{
-      id: 'abc123',
-      title: 'To Kill A Mockingbird',
-      author: 'Some Guy',
-      image: 'http://via.placeholder.com/350x150',
-      shelf: 'currentlyReading'
-    }, {
-      id: 'efg123',
-      title: 'Dark Sea of Darkness',
-      author: 'Andrew Peterson',
-      image: 'http://via.placeholder.com/350x150',
-      shelf: 'read'
-    }, {
-      id: 'hij123',
-      title: 'North or Be Eaten',
-      author: 'Andrew Peterson',
-      image: 'http://via.placeholder.com/350x150',
-      shelf: 'wantToRead'
-    }]
+    books: []
   }
 
-  changeShelf = (id, shelf) => {
-    const { books } = this.state;
+  componentDidMount() {
+    BooksAPI.getAll().then((books) => {
+      this.setState({ books })
+    })
+  }
 
-    const [bookMatch] = books.filter((b) => b.id === id);
-    bookMatch.shelf = shelf;
+  changeShelf = (book, shelf) => {
+    BooksAPI.update(book, shelf).then((res) => {
+      // TODO: Update local state after DB change
+      // const BOOKS = this.state.books;
+      // const [bookMatch] = BOOKS.filter((b) => b.id === id);
+      // bookMatch.shelf = shelf;
 
-    const newBookArr = books.filter((b) => b.id !== id);
-    newBookArr.push(bookMatch);
+      // const newBookArr = books.filter((b) => b.id !== id);
+      // newBookArr.push(bookMatch);
 
-    this.setState({
-      books: newBookArr
+      // this.setState({
+      //   books: newBookArr
+      // });
+    }).catch((err) => {
+      alert(err)
     });
   }
 
   render() {
     const { books } = this.state;
-    const currentlyReading = books.filter((book) => book.shelf === 'currentlyReading');
-    const wantToRead = books.filter((book) => book.shelf === 'wantToRead');
-    const read = books.filter((book) => book.shelf === 'read');
+    const SHELVES = [{
+      title: 'Currently Reading',
+      name: 'currentlyReading'
+    }, {
+      title: 'Want to read',
+      name: 'wantToRead'
+    }, {
+      title: 'Read',
+      name: 'read'
+    }];
 
     return (
       <div className="app">
@@ -58,15 +57,12 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                <BookShelf shelfTitle="Currently Reading"
-                          books={currentlyReading}
-                          onShelfChange={this.changeShelf} />
-                <BookShelf shelfTitle="Want to Read"
-                          books={wantToRead}
-                          onShelfChange={this.changeShelf}  />
-                <BookShelf shelfTitle="Read"
-                          books={read}
-                          onShelfChange={this.changeShelf}  />
+                {SHELVES.map((shelf) => (
+                  <BookShelf key={shelf.name}
+                             shelfTitle={shelf.title}
+                             books={books.filter((book) => book.shelf === shelf.name)}
+                             onShelfChange={this.changeShelf} />
+                ))}
               </div>
             </div>
             <div className="open-search">

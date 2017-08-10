@@ -3,20 +3,18 @@ import Book from './Book';
 
 class BookShelf extends Component {
   render() {
+    const BOOKS = this.props.books;
     return (
       <div className="bookshelf">
         <h2 className="bookshelf-title">{this.props.shelfTitle}</h2>
         <div className="bookshelf-books">
           <ol className="books-grid">
-            {this.props.books.map((book) => (
+            {BOOKS.length &&
+            (BOOKS.map((book) => (
               <Book key={book.id}
-                    bookId={book.id}
-                    title={book.title}
-                    author={book.author}
-                    cover={book.image}
-                    shelf={book.shelf}
+                    book={book}
                     onShelfChange={this.props.onShelfChange}/>
-            ))}
+            )))}
           </ol>
         </div>
       </div>
