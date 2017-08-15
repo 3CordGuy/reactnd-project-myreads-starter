@@ -15,9 +15,14 @@ class BooksApp extends React.Component {
   }
 
   componentDidMount() {
+    // Start Spinner
+    this.setState({ loading: true });
     BooksAPI.getAll().then((books) => {
-      this.setState({ books })
-    })
+      this.setState({
+        books,
+        loading: false
+      });
+    });
   }
 
   changeShelf = (book, shelf) => {
