@@ -4,11 +4,13 @@ import { Route } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Search from './Search';
 import BookShelf from './BookShelf';
+import { Loader } from './Loader';
 import './App.css';
 
 class BooksApp extends React.Component {
   state = {
-    books: []
+    books: [],
+    loading: false,
   }
 
   componentDidMount() {
@@ -18,25 +20,30 @@ class BooksApp extends React.Component {
   }
 
   changeShelf = (book, shelf) => {
+    // Start Spinner
+    this.setState({
+      loading: true
+    });
+
     BooksAPI.update(book, shelf).then((res) => {
-      // TODO: Update local state after DB change
-      // const BOOKS = this.state.books;
-      // const [bookMatch] = BOOKS.filter((b) => b.id === id);
-      // bookMatch.shelf = shelf;
+      // Change the shelf locally in state
+      const BOOKS = this.state.books;
+      const [bookMatch] = BOOKS.filter((b) => b.id === book.id);
+      bookMatch.shelf = shelf;
 
-      // const newBookArr = books.filter((b) => b.id !== id);
-      // newBookArr.push(bookMatch);
+      const newBookArr = BOOKS.filter((b) => b.id !== book.id);
 
-      // this.setState({
-      //   books: newBookArr
-      // });
+      this.setState({
+        books: newBookArr.concat([bookMatch]),
+        loading: false,
+      });
     }).catch((err) => {
       alert(err)
     });
   }
 
   render() {
-    const { books } = this.state;
+    const { books, loading } = this.state;
     const SHELVES = [{
       title: 'Currently Reading',
       name: 'currentlyReading'
@@ -50,6 +57,7 @@ class BooksApp extends React.Component {
 
     return (
       <div className="app">
+        {loading && (<Loader/>)}
         <Route exact path="/" render={() => (
           <div className="list-books">
             <div className="list-books-title">
