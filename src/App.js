@@ -10,6 +10,7 @@ import './App.css';
 class BooksApp extends React.Component {
   state = {
     books: [],
+    searchResults: [],
     loading: false,
   }
 
@@ -21,29 +22,75 @@ class BooksApp extends React.Component {
 
   changeShelf = (book, shelf) => {
     // Start Spinner
-    this.setState({
-      loading: true
-    });
+    this.setState({ loading: true });
 
     BooksAPI.update(book, shelf).then((res) => {
       // Change the shelf locally in state
       const BOOKS = this.state.books;
-      const [bookMatch] = BOOKS.filter((b) => b.id === book.id);
-      bookMatch.shelf = shelf;
 
+      // Filter out the book that is changing
+      let [bookChange] = BOOKS.filter((b) => b.id === book.id);
+
+      // Change shelf
+      if (bookChange) {
+        bookChange.shelf = shelf;
+      } else {
+        // Is new book
+        let newBook = book;
+        newBook.shelf = shelf;
+        bookChange = newBook;
+      }
+
+      // Get array without that changed book
       const newBookArr = BOOKS.filter((b) => b.id !== book.id);
 
       this.setState({
-        books: newBookArr.concat([bookMatch]),
+        books: newBookArr.concat([bookChange]),
         loading: false,
       });
     }).catch((err) => {
-      alert(err)
+      this.setState({ loading: false });
+      alert(err);
+    });
+  }
+
+  searchBooks = (query) => {
+    if (!query) {
+      return false;
+    }
+    const BOOKS = this.state.books;
+
+    this.setState({ loading: true });
+
+    BooksAPI.search(query, 10).then((res) => {
+      let results = [];
+      if (res && res.length) {
+        results = res.map((resBook) => {
+          // Map over results to compare with existing shelved books
+          const [SHELVED_BOOK] = BOOKS.filter((b) => resBook.id === b.id);
+
+          if (SHELVED_BOOK) {
+            resBook.shelf = SHELVED_BOOK.shelf;
+            return resBook;
+          }
+
+          resBook.shelf = undefined;
+          return resBook;
+        });
+      }
+
+      this.setState({
+        searchResults: results,
+        loading: false,
+      })
+    }).catch((err) => {
+      this.setState({ loading: false });
+      alert(err);
     });
   }
 
   render() {
-    const { books, loading } = this.state;
+    const { books, loading, searchResults } = this.state;
     const SHELVES = [{
       title: 'Currently Reading',
       name: 'currentlyReading'
@@ -79,7 +126,9 @@ class BooksApp extends React.Component {
           </div>
         )} />
         <Route path="/search" render={() => (
-          <Search />
+          <Search onSearch={this.searchBooks}
+                  books={searchResults}
+                  onShelfChange={this.changeShelf} />
         )} />
       </div>
     )
