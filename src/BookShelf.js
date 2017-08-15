@@ -6,7 +6,7 @@ class BookShelf extends Component {
     const BOOKS = this.props.books;
     return (
       <div className="bookshelf">
-        <h2 className="bookshelf-title">{this.props.shelfTitle}</h2>
+        <h2 className="bookshelf-title">{this.props.shelfTitle} {BOOKS.length && <span className="bookshelf-count-label">{BOOKS.length}</span>}</h2>
         <div className="bookshelf-books">
           <ol className="books-grid">
             {BOOKS.length &&

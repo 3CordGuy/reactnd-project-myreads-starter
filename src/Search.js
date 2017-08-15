@@ -25,6 +25,11 @@ class Search extends Component {
           </div>
         </div>
         <div className="search-books-results">
+          {BOOKS.length > 0 && (
+            <div className="search-books-results-count">
+              Found {BOOKS.length} Results
+            </div>
+          )}
           <ol className="books-grid">
             {BOOKS.length ?
             (BOOKS.map((book) => (
