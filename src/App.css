@@ -199,3 +199,12 @@ body, .app {
   text-align: center;
   font-size: 0.8em;
 }
+
+.example-appear {
+  opacity: 0.01;
+}
+
+.example-appear.example-appear-active {
+  opacity: 1;
+  transition: opacity 0.5s ease-in;
+}
