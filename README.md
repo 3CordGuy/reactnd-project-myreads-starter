@@ -28,6 +28,10 @@ Use the shelf selector button at the bottom right corner of each book to change 
 
 ____
 
+#### How to contribute
+
+When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
+
 #### Licensing
 
 MIT License
