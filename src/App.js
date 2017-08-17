@@ -1,9 +1,8 @@
 import React from 'react';
 import * as BooksAPI from './BooksAPI';
 import { Route } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import Search from './Search';
-import BookShelf from './BookShelf';
+import Main from './Main';
 import { Loader } from './Loader';
 import './App.css';
 
@@ -33,24 +32,14 @@ class BooksApp extends React.Component {
       // Change the shelf locally in state
       const BOOKS = this.state.books;
 
-      // Filter out the book that is changing
-      let [bookChange] = BOOKS.filter((b) => b.id === book.id);
-
-      // Change shelf
-      if (bookChange) {
-        bookChange.shelf = shelf;
-      } else {
-        // Is new book
-        let newBook = book;
-        newBook.shelf = shelf;
-        bookChange = newBook;
-      }
+      let newBook = book;
+      newBook.shelf = shelf;
 
       // Get array without that changed book
       const newBookArr = BOOKS.filter((b) => b.id !== book.id);
 
       this.setState({
-        books: newBookArr.concat([bookChange]),
+        books: newBookArr.concat([newBook]),
         loading: false,
       });
     }).catch((err) => {
@@ -61,6 +50,7 @@ class BooksApp extends React.Component {
 
   searchBooks = (query) => {
     if (!query) {
+      this.setState({ searchResults: [] });
       return false;
     }
     const BOOKS = this.state.books;
@@ -94,6 +84,12 @@ class BooksApp extends React.Component {
     });
   }
 
+  clearResults = () => {
+    this.setState({
+      searchResults: []
+    });
+  }
+
   render() {
     const { books, loading, searchResults } = this.state;
     const SHELVES = [{
@@ -111,29 +107,16 @@ class BooksApp extends React.Component {
       <div className="app">
         {loading && (<Loader/>)}
         <Route exact path="/" render={() => (
-          <div className="list-books">
-            <div className="list-books-title">
-              <h1>MyReads</h1>
-            </div>
-            <div className="list-books-content">
-              <div>
-                {SHELVES.map((shelf) => (
-                  <BookShelf key={shelf.name}
-                             shelfTitle={shelf.title}
-                             books={books.filter((book) => book.shelf === shelf.name)}
-                             onShelfChange={this.changeShelf} />
-                ))}
-              </div>
-            </div>
-            <div className="open-search">
-              <Link to="/search">Add a book</Link>
-            </div>
-          </div>
+          <Main shelves={SHELVES}
+                books={books}
+                onShelfChange={this.changeShelf}
+                onLoad={this.clearResults} />
+
         )} />
         <Route path="/search" render={() => (
-          <Search onSearch={this.searchBooks}
-                  books={searchResults}
-                  onShelfChange={this.changeShelf} />
+            <Search onSearch={this.searchBooks}
+                    books={searchResults}
+                    onShelfChange={this.changeShelf} />
         )} />
       </div>
     )
