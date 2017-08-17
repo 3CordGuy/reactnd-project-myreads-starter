@@ -18,7 +18,7 @@ class Book extends Component {
           transitionLeave={false}>
           <div className="book">
             <div className="book-top">
-              <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${BOOK.imageLinks && BOOK.imageLinks.thumbnail}")` }}></div>
+              <div className="book-cover" style={{ backgroundImage: `url("${BOOK.imageLinks && BOOK.imageLinks.thumbnail}")` }}></div>
               <div className="book-shelf-changer">
                 <select value={BOOK.shelf || ''} onChange={this.handleChange}>
                   <option value="" disabled>Move to...</option>
